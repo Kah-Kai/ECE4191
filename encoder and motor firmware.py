@@ -46,7 +46,7 @@ def encoderRB_callback(channel):
 # Motor calibration function
 # Returns: left motor duty cycle scaling factor, right motor duty cycle scaling factor 
 def motor_calibration(calibration_interval):
-    global LA, LB, RA, RB  # Declare global variables
+    global LA, LB, RA, RB, Lscale, Rscale  # Declare global variables
 
     # Reset counters
     LA = 0  
@@ -70,16 +70,15 @@ def motor_calibration(calibration_interval):
     
     # Calibration logic
     if (LA + LB) > (RA + RB):  # Left motor stronger, scale down left motor
-        return (RA + RB) / (LA + LB), 1
-    return 1, (LA + LB) / (RA + RB)
+        Lscale = (RA + RB) / (LA + LB)
+        Rscale = 1
+    else:
+        Lscale = 1
+        Rscale = (LA + LB) / (RA + RB)
 
-# Callback to run calibration
-def run_calibration_callback(channel):  # Added channel parameter
-    global Lscale, Rscale
-    Lscale, Rscale = motor_calibration(10)  # Calibrate for 10 seconds
 
 # Add event detection for calibration
-GPIO.add_event_detect(calibration_pin, GPIO.RISING, callback=run_calibration_callback)
+GPIO.add_event_detect(calibration_pin, GPIO.RISING, callback=motor_calibration(10))
 
 try:
     # Main loop or additional code can go here
