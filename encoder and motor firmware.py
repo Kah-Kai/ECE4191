@@ -6,6 +6,7 @@ enLA_pin = 36
 enLB_pin = 38
 enRA_pin = 35
 enRB_pin = 37
+calibration_pin = 39
 
 # Set the GPIO mode to use physical pin numbers
 GPIO.setmode(GPIO.BOARD)
@@ -15,8 +16,11 @@ GPIO.setup(enLA_pin, GPIO.IN)
 GPIO.setup(enLB_pin, GPIO.IN)
 GPIO.setup(enRA_pin, GPIO.IN)
 GPIO.setup(enRB_pin, GPIO.IN)
+GPIO.setup(calibration_pin, GPIO.IN)
 
 # Initialise global variables
+Lscale = 1  # Default scale is 1 (no scaling)
+Rscale = 1  # Default scale is 1 (no scaling)
 LA = 0
 LB = 0
 RA = 0
@@ -39,11 +43,8 @@ def encoderRB_callback(channel):
     global RB
     RB += 1
 
-def disable_interrupts_for_pin(pin):
-    GPIO.remove_event_detect(pin)
-
 # Motor calibration function
-# returns :  left motor duty cycle scalling factor, right motor duty cycle scalling factor 
+# Returns: left motor duty cycle scaling factor, right motor duty cycle scaling factor 
 def motor_calibration(calibration_interval):
     global LA, LB, RA, RB  # Declare global variables
 
@@ -62,20 +63,28 @@ def motor_calibration(calibration_interval):
     time.sleep(calibration_interval)  # Wait and count
     
     # Disable further interrupts 
-    disable_interrupts_for_pin(enLA_pin)
-    disable_interrupts_for_pin(enLB_pin)
-    disable_interrupts_for_pin(enRA_pin)
-    disable_interrupts_for_pin(enRB_pin)
+    GPIO.remove_event_detect(enLA_pin)
+    GPIO.remove_event_detect(enLB_pin)
+    GPIO.remove_event_detect(enRA_pin)
+    GPIO.remove_event_detect(enRB_pin)
     
     # Calibration logic
     if (LA + LB) > (RA + RB):  # Left motor stronger, scale down left motor
         return (RA + RB) / (LA + LB), 1
     return 1, (LA + LB) / (RA + RB)
 
-# Example usage
+# Callback to run calibration
+def run_calibration_callback(channel):  # Added channel parameter
+    global Lscale, Rscale
+    Lscale, Rscale = motor_calibration(10)  # Calibrate for 10 seconds
+
+# Add event detection for calibration
+GPIO.add_event_detect(calibration_pin, GPIO.RISING, callback=run_calibration_callback)
+
 try:
-    left_scale, right_scale = motor_calibration(5)  # Calibrate for 5 seconds
-    print(f"Left Scale: {left_scale}, Right Scale: {right_scale}")
+    # Main loop or additional code can go here
+    while True:
+        time.sleep(1)  # Just keep the program running
 
 except KeyboardInterrupt:
     pass
