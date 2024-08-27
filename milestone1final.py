@@ -8,6 +8,12 @@ enRA_pin = 35
 enRB_pin = 37
 calibration_pin = 39
 
+# Define motor control pins
+in1_pin = 12
+in2_pin = 13
+in3_pin = 18
+in4_pin = 19
+
 # Set the GPIO mode to use physical pin numbers
 GPIO.setmode(GPIO.BOARD)
 
@@ -17,6 +23,12 @@ GPIO.setup(enLB_pin, GPIO.IN)
 GPIO.setup(enRA_pin, GPIO.IN)
 GPIO.setup(enRB_pin, GPIO.IN)
 GPIO.setup(calibration_pin, GPIO.IN)
+
+# Set pins as output for motor control
+GPIO.setup(in1_pin, GPIO.OUT)
+GPIO.setup(in2_pin, GPIO.OUT)
+GPIO.setup(in3_pin, GPIO.OUT)
+GPIO.setup(in4_pin, GPIO.OUT)
 
 # Initialise global variables
 Lscale = 1  # Default scale is 1 (no scaling)
