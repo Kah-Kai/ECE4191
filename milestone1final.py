@@ -17,10 +17,15 @@ in4_pin = 19
 GPIO.setmode(GPIO.BOARD)
 
 # Set pins as input for encoders
-GPIO.setup(enLA_pin, GPIO.IN)
-GPIO.setup(enLB_pin, GPIO.IN)
-GPIO.setup(enRA_pin, GPIO.IN)
-GPIO.setup(enRB_pin, GPIO.IN)
+#GPIO.setup(enLA_pin, GPIO.IN)
+#GPIO.setup(enLB_pin, GPIO.IN)
+#GPIO.setup(enRA_pin, GPIO.IN)
+#GPIO.setup(enRB_pin, GPIO.IN)
+GPIO.setup(enLA_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(enLB_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(enRA_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(enRB_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
 
 # Set pins as output for motor control
 GPIO.setup(in1_pin, GPIO.OUT)
