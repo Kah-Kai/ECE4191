@@ -21,10 +21,10 @@ GPIO.setmode(GPIO.BOARD)
 #GPIO.setup(enLB_pin, GPIO.IN)
 #GPIO.setup(enRA_pin, GPIO.IN)
 #GPIO.setup(enRB_pin, GPIO.IN)
-GPIO.setup(enLA_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(enLB_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(enRA_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(enRB_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(enLA_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(enLB_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(enRA_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(enRB_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 
 # Set pins as output for motor control
