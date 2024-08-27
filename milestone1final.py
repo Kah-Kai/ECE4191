@@ -154,6 +154,7 @@ def motor_calibration(calibration_interval):
 
 try:
     # Main loop or additional code can go here
+    motor_calibration(10)
     while True:
         time.sleep(1)  # Just keep the program running
 
