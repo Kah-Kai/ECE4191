@@ -6,7 +6,6 @@ enLA_pin = 36
 enLB_pin = 38
 enRA_pin = 35
 enRB_pin = 37
-calibration_pin = 39
 
 # Define motor control pins
 in1_pin = 12
@@ -22,7 +21,6 @@ GPIO.setup(enLA_pin, GPIO.IN)
 GPIO.setup(enLB_pin, GPIO.IN)
 GPIO.setup(enRA_pin, GPIO.IN)
 GPIO.setup(enRB_pin, GPIO.IN)
-GPIO.setup(calibration_pin, GPIO.IN)
 
 # Set pins as output for motor control
 GPIO.setup(in1_pin, GPIO.OUT)
@@ -112,6 +110,7 @@ def motor_calibration(calibration_interval):
 
     ### activate motor forward ###
     motorControl([1,1])
+    wait.sleep(2) # let motor get to full speed
     GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
     GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
@@ -121,13 +120,13 @@ def motor_calibration(calibration_interval):
     GPIO.remove_event_detect(enLB_pin)
     GPIO.remove_event_detect(enRA_pin)
     GPIO.remove_event_detect(enRB_pin)
+    motorControl([0,0])
     # forward calibration logic calibration logic
     LF = LA + LB
     RF = RA + RB
     forwardMin = min(LF, RF)
     LFscale = forwardMin/LF
     RFscale = forwardMin/RF
-    
     # backwards calibration
     LA = 0  
     LB = 0
@@ -135,6 +134,7 @@ def motor_calibration(calibration_interval):
     RB = 0
     ### activate motor backwards ###
     motorControl([-1,-1])
+    wait.sleep(2) # let motor get to full speed
     GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
     GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
@@ -144,15 +144,13 @@ def motor_calibration(calibration_interval):
     GPIO.remove_event_detect(enLB_pin)
     GPIO.remove_event_detect(enRA_pin)
     GPIO.remove_event_detect(enRB_pin)
+    motorControl([0,0])
     # backward calibration logic calibration logic
     backwardMin = min(LA+LB,RA+RB) # minimum backwards encoder distance
     FBscale = backwardMin/forwardMin # forward-backward scale
     LBscale = LFscale * FBscale
     RBscale = RFscale * FBscale
     
-
-# Add event detection for calibration
-GPIO.add_event_detect(calibration_pin, GPIO.RISING, callback=motor_calibration(10))
 
 try:
     # Main loop or additional code can go here
