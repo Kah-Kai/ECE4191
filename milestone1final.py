@@ -110,7 +110,7 @@ def motor_calibration(calibration_interval):
 
     ### activate motor forward ###
     motorControl([1,1])
-    time.sleep(2000) # let motor get to full speed
+    time.sleep(2) # let motor get to full speed
     GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
     GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
@@ -134,7 +134,7 @@ def motor_calibration(calibration_interval):
     RB = 0
     ### activate motor backwards ###
     motorControl([-1,-1])
-    time.sleep(2000) # let motor get to full speed
+    time.sleep(2) # let motor get to full speed
     GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
     GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
@@ -154,7 +154,7 @@ def motor_calibration(calibration_interval):
 
 try:
     # Main loop or additional code can go here
-    motor_calibration(10000)
+    motor_calibration(10)
     while True:
         time.sleep(1)  # Just keep the program running
 
