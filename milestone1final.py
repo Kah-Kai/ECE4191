@@ -31,8 +31,11 @@ GPIO.setup(in3_pin, GPIO.OUT)
 GPIO.setup(in4_pin, GPIO.OUT)
 
 # Initialise global variables
-Lscale = 1  # Default scale is 1 (no scaling)
-Rscale = 1  # Default scale is 1 (no scaling)
+LFscale = 1  # Default scale is 1 (no scaling)
+RFscale = 1  # Default scale is 1 (no scaling)
+RBscale = 1 # Default reverse scale is 1 (no scaling)
+RBscale = 1 # Default reverse scale is 1 (no scaling)
+
 LA = 0
 LB = 0
 RA = 0
@@ -58,36 +61,55 @@ def encoderRB_callback(channel):
 # Motor calibration function
 # Returns: left motor duty cycle scaling factor, right motor duty cycle scaling factor 
 def motor_calibration(calibration_interval):
-    global LA, LB, RA, RB, Lscale, Rscale  # Declare global variables
-
+    global LA, LB, RA, RB, LFscale, RFscale, LBscale, RBscale  # Declare global variables
     # Reset counters
     LA = 0  
     LB = 0
     RA = 0
-    RB = 0  
-    
-    # Add interrupt event listeners
-    GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback)
+    RB = 0
+    RF = 0 # right forward count
+    RB = 0 # right backwards count
+    LF = 0 # left forward count
+    LB = 0 # left backwards count
+
+    ### activate motor forward ###
+    GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
     GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
     GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
-    
     time.sleep(calibration_interval)  # Wait and count
-    
-    # Disable further interrupts 
-    GPIO.remove_event_detect(enLA_pin)
+    GPIO.remove_event_detect(enLA_pin) # Disable further interrupts 
     GPIO.remove_event_detect(enLB_pin)
     GPIO.remove_event_detect(enRA_pin)
     GPIO.remove_event_detect(enRB_pin)
+    # forward calibration logic calibration logic
+    LF = LA + LB
+    RF = RA + RB
+    forwardMin = min(LF, RF)
+    LFscale = forwardMin/LF
+    RFscale = forwardMin/RF
     
-    # Calibration logic
-    if (LA + LB) > (RA + RB):  # Left motor stronger, scale down left motor
-        Lscale = (RA + RB) / (LA + LB)
-        Rscale = 1
-    else:
-        Lscale = 1
-        Rscale = (LA + LB) / (RA + RB)
-
+    # backwards calibration
+    LA = 0  
+    LB = 0
+    RA = 0
+    RB = 0
+    ### activate motor backwards ###
+    GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
+    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
+    GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
+    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
+    time.sleep(calibration_interval)  # Wait and count
+    GPIO.remove_event_detect(enLA_pin) # Disable further interrupts
+    GPIO.remove_event_detect(enLB_pin)
+    GPIO.remove_event_detect(enRA_pin)
+    GPIO.remove_event_detect(enRB_pin)
+    # backward calibration logic calibration logic
+    backwardMin = min(LA+LB,RA+RB) # minimum backwards encoder distance
+    FBscale = backwardMin/forwardMin # forward-backward scale
+    LBscale = LFscale * FBscale
+    RBscale = RFscale * FBscale
+    
 
 # Add event detection for calibration
 GPIO.add_event_detect(calibration_pin, GPIO.RISING, callback=motor_calibration(10))
