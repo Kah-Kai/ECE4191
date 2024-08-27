@@ -30,6 +30,19 @@ GPIO.setup(in2_pin, GPIO.OUT)
 GPIO.setup(in3_pin, GPIO.OUT)
 GPIO.setup(in4_pin, GPIO.OUT)
 
+# Set up PWM for motor control
+frequency = 15000
+pwm_IN1 = GPIO.PWM(in1_pin, frequency)
+pwm_IN2 = GPIO.PWM(in2_pin, frequency)
+pwm_IN3 = GPIO.PWM(in3_pin, frequency)
+pwm_IN4 = GPIO.PWM(in4_pin, frequency)
+
+# Start PWM with a duty cycle of 0% (off) for all pins
+pwm_IN1.start(0)
+pwm_IN2.start(0)
+pwm_IN3.start(0)
+pwm_IN4.start(0)
+
 # Initialise global variables
 LFscale = 1  # Default scale is 1 (no scaling)
 RFscale = 1  # Default scale is 1 (no scaling)
@@ -58,6 +71,31 @@ def encoderRB_callback(channel):
     global RB
     RB += 1
 
+# input [leftmotor, right motor, enable] between -1,1
+def motorControl(motorInput):
+    global LFscale, LBscale, RBscale, RFscale
+    left_velocity = motorInput[0]
+    right_velocity = motorInput[1]
+    if -1 <= left_velocity <= 0:  # Backward
+        pwm_IN1.ChangeDutyCycle(0)
+        pwm_IN2.ChangeDutyCycle(abs(left_velocity) * 100 * LBscale)
+    elif 0 < left_velocity <= 1:  # Forward
+        pwm_IN1.ChangeDutyCycle(left_velocity * 100 * LFscale)
+        pwm_IN2.ChangeDutyCycle(0)
+    else:
+        print("Invalid left wheel velocity. Please enter a value between -1 and 1.")
+        return
+
+    if -1 <= right_velocity <= 0:  # Backward
+        pwm_IN3.ChangeDutyCycle(0)
+        pwm_IN4.ChangeDutyCycle(abs(right_velocity) * 100 * RBscale)
+    elif 0 < right_velocity <= 1:  # Forward
+        pwm_IN3.ChangeDutyCycle(right_velocity * 100 * RFscale)
+        pwm_IN4.ChangeDutyCycle(0)
+    else:
+        print("Invalid right wheel velocity. Please enter a value between -1 and 1.")
+        return
+        
 # Motor calibration function
 # Returns: left motor duty cycle scaling factor, right motor duty cycle scaling factor 
 def motor_calibration(calibration_interval):
@@ -73,6 +111,7 @@ def motor_calibration(calibration_interval):
     LB = 0 # left backwards count
 
     ### activate motor forward ###
+    motorControl([1,1])
     GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
     GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
@@ -95,6 +134,7 @@ def motor_calibration(calibration_interval):
     RA = 0
     RB = 0
     ### activate motor backwards ###
+    motorControl([-1,-1])
     GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
     GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
