@@ -116,10 +116,10 @@ def motor_calibration(calibration_interval):
     ### activate motor forward ###
     motorControl([1,1])
     time.sleep(2) # let motor get to full speed
-    GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
-    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
-    GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
-    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
+    GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback,bouncetime=10) # Add interrupt event listeners
+    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback,bouncetime=10)
+    GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback,bouncetime=10)
+    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback,bouncetime=10)
     time.sleep(calibration_interval)  # Wait and count
     GPIO.remove_event_detect(enLA_pin) # Disable further interrupts 
     GPIO.remove_event_detect(enLB_pin)
@@ -140,10 +140,10 @@ def motor_calibration(calibration_interval):
     ### activate motor backwards ###
     motorControl([-1,-1])
     time.sleep(2) # let motor get to full speed
-    GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
-    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
-    GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
-    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
+    GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback,bouncetime=10) # Add interrupt event listeners
+    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback,bouncetime=10)
+    GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback,bouncetime=10)
+    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback,bouncetime=10)
     time.sleep(calibration_interval)  # Wait and count
     GPIO.remove_event_detect(enLA_pin) # Disable further interrupts
     GPIO.remove_event_detect(enLB_pin)
