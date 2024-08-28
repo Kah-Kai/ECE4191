@@ -364,7 +364,6 @@ def align_w_ball():
 
             if av_ball_data[2] >= 0.5:
                 return av_ball_data[3]
-                break
 
 def approach_ball(dist_2_ball):
     # Drive Towards Ball and leave 10cm gap
