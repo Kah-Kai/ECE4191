@@ -68,6 +68,18 @@ LB = 0
 RA = 0
 RB = 0
 
+def enableEncoder():
+    #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
+    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
+    #GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
+    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
+
+def disableEncoder():
+    #GPIO.remove_event_detect(enLA_pin) # Disable further interrupts
+    GPIO.remove_event_detect(enLB_pin)
+    #GPIO.remove_event_detect(enRA_pin)
+    GPIO.remove_event_detect(enRB_pin)
+    
 def clearEncoder():
     global LA,LB,RA,RB
     LA = 0
@@ -125,17 +137,16 @@ def drive_dist(dist, power=1):
         motor_input = power * [1, 1]
         motorControl(motor_input, encoder, encoder)
     elif dist == 0:
+        return
 
 
 def turn_robot(angle):
     # turn robot a certain angle
     encoder = angle/360 * (2*np.pi*trk_w/2)/(2*np.pi*whl_r) * gear * enc_pulse
-    if angle < 0:
-        # turn right
+    if angle < 0: # turn right
         motor_input = [1, -1]
         motorControl(motor_input, encoder, encoder)
-    elif angle > 0:
-        # turn left
+    elif angle > 0: # turn left
         motor_input = [-1, 1]
         motorControl(motor_input, encoder, encoder)
     elif angle == 0:
@@ -200,52 +211,43 @@ def motor_calibration(calibration_interval):
     LBscale = 1
     RFscale = 1
     RBscale = 1
-    LA = 0  
-    LB = 0
-    RA = 0
-    RB = 0
-    RF = 0 # right forward count
-    RB = 0 # right backwards count
-    LF = 0 # left forward count
-    LB = 0 # left backwards count
-
+    clearEncoder()
+    
     ### activate motor forward ###
-    motorControl([1,1])
+    pwm_IN1.ChangeDutyCycle(100)
+    pwm_IN2.ChangeDutyCycle(0)
+    pwm_IN3.ChangeDutyCycle(100)
+    pwm_IN4.ChangeDutyCycle(0)
+    
     time.sleep(2) # let motor get to full speed
-    #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
-    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
-    #GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
-    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
+    enableEncoder()
     time.sleep(calibration_interval)  # Wait and count
-    #GPIO.remove_event_detect(enLA_pin) # Disable further interrupts 
-    GPIO.remove_event_detect(enLB_pin)
-    #GPIO.remove_event_detect(enRA_pin)
-    GPIO.remove_event_detect(enRB_pin)
-    motorControl([0,0])
+    disableEncoder()
+    
+    pwm_IN1.ChangeDutyCycle(0)
+    pwm_IN2.ChangeDutyCycle(0)
+    pwm_IN3.ChangeDutyCycle(0)
+    pwm_IN4.ChangeDutyCycle(0)
+    
     # forward calibration logic calibration logic
-    LF = LA + LB
-    RF = RA + RB
-    forwardMin = min(LF, RF)
-    LFscale = forwardMin/LF
-    RFscale = forwardMin/RF
+    forwardMin = min(LA + LB, RA + RB)
+    LFscale = forwardMin/(LA + LB)
+    RFscale = forwardMin/(RA + RB)
     # backwards calibration
-    LA = 0  
-    LB = 0
-    RA = 0
-    RB = 0
+    clearEncoder()
     ### activate motor backwards ###
-    motorControl([-1,-1])
+    pwm_IN1.ChangeDutyCycle(0)
+    pwm_IN2.ChangeDutyCycle(100)
+    pwm_IN3.ChangeDutyCycle(0)
+    pwm_IN4.ChangeDutyCycle(100)
     time.sleep(2) # let motor get to full speed
-    #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
-    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
-    #GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
-    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
+    enableEncoder()
     time.sleep(calibration_interval)  # Wait and count
-    #GPIO.remove_event_detect(enLA_pin) # Disable further interrupts
-    GPIO.remove_event_detect(enLB_pin)
-    #GPIO.remove_event_detect(enRA_pin)
-    GPIO.remove_event_detect(enRB_pin)
-    motorControl([0,0])
+    disableEncoder()
+    pwm_IN1.ChangeDutyCycle(0)
+    pwm_IN2.ChangeDutyCycle(0)
+    pwm_IN3.ChangeDutyCycle(0)
+    pwm_IN4.ChangeDutyCycle(0)
     # backward calibration logic calibration logic
     backwardMin = min(LA+LB,RA+RB) # minimum backwards encoder distance
     FBscale = backwardMin/forwardMin # forward-backward scale
