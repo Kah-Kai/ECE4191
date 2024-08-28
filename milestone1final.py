@@ -375,10 +375,11 @@ def approach_ball(dist_2_ball):
         av_ball_data = np.mean(ball_data)
 
         if av_ball_data[3] < 0.5:
+            continue
             # reduce motor speed by half
 
         # if balls on screen and distance less than prox
-        if ( (av_ball_data[4] > 0) and (av_ball_data[3] <= prox_ball_dist) ):
+        if av_ball_data[4] > 0 and av_ball_data[3] <= prox_ball_dist:
             break
         # if balls not on screen and travel distance > distance to ball - proximity
         if av_ball_data[4] < 1 & trav_dist >= dist_2_ball - prox_ball_dist:
