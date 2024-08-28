@@ -65,8 +65,21 @@ LB = 0
 RA = 0
 RB = 0
 
-def motorControl(motorInput):
-    global LFscale, LBscale, RBscale, RFscale
+def clearEncoder():
+    global LA,LB,RA,RB
+    LA = 0
+    LB = 0
+    RA = 0
+    RB = 0
+
+# returns left encoder count , right encoder count
+def getEncoder():
+    global LA,LB,RA,RB
+    return LA+LB, RA+RB
+    
+def motorControl(motorInput, left_encoder, right_encoder):
+    global LFscale, LBscale, RBscale, RFscale, LA, LB, RA, RB
+    clearEncoder()
     left_velocity = motorInput[0]
     right_velocity = motorInput[1]
     if -1 <= left_velocity <= 0:  # Backward
@@ -88,6 +101,13 @@ def motorControl(motorInput):
     else:
         print("Invalid right wheel velocity. Please enter a value between -1 and 1.")
         return
+    # if either wheel reaches encoder goal then stop
+    current_encoder = getEncoder()
+    while(getEncoder(0) < left encoder or getEncoder(1) < right_encoder):
+        time.sleep(1/1000) # 1ms reduce cpu usage
+        current_encoder = getEncoder()
+    robot_goal = True
+    return current_encoder
         
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Robot
@@ -146,6 +166,10 @@ def encoderRB_callback(channel):
 def motor_calibration(calibration_interval):
     global LA, LB, RA, RB, LFscale, RFscale, LBscale, RBscale  # Declare global variables
     # Reset counters
+    LFscale = 1
+    LBscale = 1
+    RFscale = 1
+    RBscale = 1
     LA = 0  
     LB = 0
     RA = 0
