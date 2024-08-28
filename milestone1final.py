@@ -38,7 +38,7 @@ GPIO.setup(in3_pin, GPIO.OUT)
 GPIO.setup(in4_pin, GPIO.OUT)
 
 # Set up PWM for motor control
-frequency = 15000
+frequency = 1000
 pwm_IN1 = GPIO.PWM(in1_pin, frequency)
 pwm_IN2 = GPIO.PWM(in2_pin, frequency)
 pwm_IN3 = GPIO.PWM(in3_pin, frequency)
