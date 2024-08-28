@@ -136,8 +136,9 @@ def drive_dist(dist, power=1):
         # forwards
         motor_input = power * [1, 1]
         motorControl(motor_input, encoder_goal, encoder_goal)
-    elif dist == 0:
-        return
+    # elif dist == 0:
+    #     return
+    else: return
 
 
 def turn_robot(angle):
@@ -149,8 +150,9 @@ def turn_robot(angle):
     elif angle > 0: # turn left
         motor_input = [-1, 1]
         motorControl(motor_input, encoder_goal, encoder_goal)
-    elif angle == 0:
-        continue
+    # elif angle == 0:
+    #     continue
+    else: return
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Robot
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
