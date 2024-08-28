@@ -180,7 +180,10 @@ def motor_calibration(calibration_interval):
     LB = 0 # left backwards count
 
     ### activate motor forward ###
-    motorControl([1,1])
+    pwm_IN3.ChangeDutyCycle(1)
+    pwm_IN4.ChangeDutyCycle(0)
+    pwm_IN3.ChangeDutyCycle(1)
+    pwm_IN4.ChangeDutyCycle(0)
     time.sleep(2) # let motor get to full speed
     #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
@@ -191,7 +194,10 @@ def motor_calibration(calibration_interval):
     GPIO.remove_event_detect(enLB_pin)
     #GPIO.remove_event_detect(enRA_pin)
     GPIO.remove_event_detect(enRB_pin)
-    motorControl([0,0])
+    pwm_IN3.ChangeDutyCycle(0)
+    pwm_IN4.ChangeDutyCycle(0)
+    pwm_IN3.ChangeDutyCycle(0)
+    pwm_IN4.ChangeDutyCycle(0)
     # forward calibration logic calibration logic
     LF = LA + LB
     RF = RA + RB
@@ -204,7 +210,10 @@ def motor_calibration(calibration_interval):
     RA = 0
     RB = 0
     ### activate motor backwards ###
-    motorControl([-1,-1])
+    pwm_IN3.ChangeDutyCycle(0)
+    pwm_IN4.ChangeDutyCycle(1)
+    pwm_IN3.ChangeDutyCycle(0)
+    pwm_IN4.ChangeDutyCycle(1)
     time.sleep(2) # let motor get to full speed
     #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
@@ -215,13 +224,16 @@ def motor_calibration(calibration_interval):
     GPIO.remove_event_detect(enLB_pin)
     #GPIO.remove_event_detect(enRA_pin)
     GPIO.remove_event_detect(enRB_pin)
-    motorControl([0,0])
+    pwm_IN3.ChangeDutyCycle(0)
+    pwm_IN4.ChangeDutyCycle(0)
+    pwm_IN3.ChangeDutyCycle(0)
+    pwm_IN4.ChangeDutyCycle(0)
     # backward calibration logic calibration logic
     backwardMin = min(LA+LB,RA+RB) # minimum backwards encoder distance
     FBscale = backwardMin/forwardMin # forward-backward scale
     LBscale = LFscale * FBscale
     RBscale = RFscale * FBscale
-
+    print(LFscale, RFscale, LBscale, RBscale)
 
 # Ball Detection
 
