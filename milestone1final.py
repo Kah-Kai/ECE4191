@@ -71,13 +71,28 @@ def clearEncoder():
     RA = 0
     RB = 0
 
+def enableEncoder():
+    #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
+    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
+    #GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
+    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
+
+
+def disableEncoder():
+    #GPIO.remove_event_detect(enLA_pin) # Disable further interrupts
+    GPIO.remove_event_detect(enLB_pin)
+    #GPIO.remove_event_detect(enRA_pin)
+    GPIO.remove_event_detect(enRB_pin)
+
+
 # returns left encoder count , right encoder count
 def getEncoder():
     global LA,LB,RA,RB
-    return LA+LB, RA+RB
-    
+    return LA+LB,RA+RB
+# input : ( [1, 1], 10000, 10000) go straight at full speed for 10000 units
 def motorControl(motorInput, left_encoder, right_encoder):
     global LFscale, LBscale, RBscale, RFscale, LA, LB, RA, RB
+    enableEncoder()
     clearEncoder()
     left_velocity = motorInput[0]
     right_velocity = motorInput[1]
@@ -106,6 +121,7 @@ def motorControl(motorInput, left_encoder, right_encoder):
         time.sleep(1/1000) # 1ms reduce cpu usage
         left_count, right_count = getEncoder()
     robot_goal = True
+    disableEncoder()
     return left_count, right_count
         
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -184,15 +200,9 @@ def motor_calibration(calibration_interval):
     pwm_IN3.ChangeDutyCycle(100)
     pwm_IN4.ChangeDutyCycle(0)
     time.sleep(2) # let motor get to full speed
-    #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
-    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
-    #GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
-    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
+    enableEncoder()
     time.sleep(calibration_interval)  # Wait and count
-    #GPIO.remove_event_detect(enLA_pin) # Disable further interrupts 
-    GPIO.remove_event_detect(enLB_pin)
-    #GPIO.remove_event_detect(enRA_pin)
-    GPIO.remove_event_detect(enRB_pin)
+    disableEncoder()
     pwm_IN1.ChangeDutyCycle(0)
     pwm_IN2.ChangeDutyCycle(0)
     pwm_IN3.ChangeDutyCycle(0)
@@ -214,15 +224,9 @@ def motor_calibration(calibration_interval):
     pwm_IN3.ChangeDutyCycle(0)
     pwm_IN4.ChangeDutyCycle(100)
     time.sleep(2) # let motor get to full speed
-    #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
-    GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
-    #GPIO.add_event_detect(enRA_pin, GPIO.RISING, callback=encoderRA_callback)
-    GPIO.add_event_detect(enRB_pin, GPIO.RISING, callback=encoderRB_callback)
+    enableEncoder()
     time.sleep(calibration_interval)  # Wait and count
-    #GPIO.remove_event_detect(enLA_pin) # Disable further interrupts
-    GPIO.remove_event_detect(enLB_pin)
-    #GPIO.remove_event_detect(enRA_pin)
-    GPIO.remove_event_detect(enRB_pin)
+    disableEncoder()
     pwm_IN1.ChangeDutyCycle(0)
     pwm_IN2.ChangeDutyCycle(0)
     pwm_IN3.ChangeDutyCycle(0)
