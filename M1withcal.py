@@ -150,6 +150,7 @@ def turn_robot(angle):
         motor_input = [-1, 1]
         motorControl(motor_input, encoder_goal, encoder_goal)
     elif angle == 0:
+        continue
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Robot
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
