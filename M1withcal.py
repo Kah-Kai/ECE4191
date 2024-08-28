@@ -10,9 +10,9 @@ import time
 ## Raspberry Pi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Define encoder pins
-enLA_pin = 36
+#enLA_pin = 36
 enLB_pin = 38
-enRA_pin = 35
+#enRA_pin = 35
 enRB_pin = 37
 
 
@@ -26,9 +26,9 @@ in4_pin = 19
 GPIO.setmode(GPIO.BOARD)
 
 # Set pins as input for encoders
-GPIO.setup(enLA_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+#GPIO.setup(enLA_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(enLB_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(enRA_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+#GPIO.setup(enRA_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(enRB_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 # Set pins as output for motor control
@@ -38,7 +38,7 @@ GPIO.setup(in3_pin, GPIO.OUT)
 GPIO.setup(in4_pin, GPIO.OUT)
 
 # Set up PWM for motor control
-frequency = 15000
+frequency = 5000
 pwm_IN1 = GPIO.PWM(in1_pin, frequency)
 pwm_IN2 = GPIO.PWM(in2_pin, frequency)
 pwm_IN3 = GPIO.PWM(in3_pin, frequency)
@@ -127,28 +127,28 @@ def motorControl(motorInput, left_encoder, right_encoder):
 
 def drive_dist(dist, power=1):
     # drive robot straigt for certain distance
-    encoder = dist/(2*np.pi*whl_r) * gear * enc_pulse
+    encoder_goal = dist/(2*np.pi*whl_r) * gear * enc_pulse
     if dist < 0:
         # backwards
         motor_input = power * [-1, -1]
-        motorControl(motor_input, encoder, encoder)
+        motorControl(motor_input, encoder_goal, encoder_goal)
     elif dist > 0:
         # forwards
         motor_input = power * [1, 1]
-        motorControl(motor_input, encoder, encoder)
+        motorControl(motor_input, encoder_goal, encoder_goal)
     elif dist == 0:
         return
 
 
 def turn_robot(angle):
     # turn robot a certain angle
-    encoder = angle/360 * (2*np.pi*trk_w/2)/(2*np.pi*whl_r) * gear * enc_pulse
+    encoder_goal = angle/360 * (2*np.pi*trk_w/2)/(2*np.pi*whl_r) * gear * enc_pulse
     if angle < 0: # turn right
         motor_input = [1, -1]
-        motorControl(motor_input, encoder, encoder)
+        motorControl(motor_input, encoder_goal, encoder_goal)
     elif angle > 0: # turn left
         motor_input = [-1, 1]
-        motorControl(motor_input, encoder, encoder)
+        motorControl(motor_input, encoder_goal, encoder_goal)
     elif angle == 0:
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Robot
@@ -253,6 +253,7 @@ def motor_calibration(calibration_interval):
     FBscale = backwardMin/forwardMin # forward-backward scale
     LBscale = LFscale * FBscale
     RBscale = RFscale * FBscale
+    print(LFscale, RFscale, LFscale, LBscale)
 
 def wheel_calib():
     # Calibrate Radius of Robot Wheels
@@ -529,7 +530,7 @@ def main():
 
     if cv2.waitKey(30) & 0xFF == ord('q'):
         return
-
+    
 except KeyboardInterrupt:
     pass
 
