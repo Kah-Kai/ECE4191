@@ -185,15 +185,11 @@ def motor_calibration(calibration_interval):
     LBscale = 1
     RFscale = 1
     RBscale = 1
-    LA = 0  
-    LB = 0
-    RA = 0
-    RB = 0
+    clearEncoder()
     RF = 0 # right forward count
     RB = 0 # right backwards count
     LF = 0 # left forward count
     LB = 0 # left backwards count
-
     ### activate motor forward ###
     pwm_IN1.ChangeDutyCycle(100)
     pwm_IN2.ChangeDutyCycle(0)
@@ -208,16 +204,11 @@ def motor_calibration(calibration_interval):
     pwm_IN3.ChangeDutyCycle(0)
     pwm_IN4.ChangeDutyCycle(0)
     # forward calibration logic calibration logic
-    LF = LA + LB
-    RF = RA + RB
-    forwardMin = min(LF, RF)
-    LFscale = forwardMin/LF
-    RFscale = forwardMin/RF
+    forwardMin = min(LA + LB, RA + RB)
+    LFscale = forwardMin/(LA + LB)
+    RFscale = forwardMin/(RA + RB)
     # backwards calibration
-    LA = 0  
-    LB = 0
-    RA = 0
-    RB = 0
+    clearEncoder()
     ### activate motor backwards ###
     pwm_IN1.ChangeDutyCycle(0)
     pwm_IN2.ChangeDutyCycle(100)
