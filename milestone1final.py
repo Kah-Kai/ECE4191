@@ -179,8 +179,8 @@ def motor_calibration(calibration_interval):
     LB = 0 # left backwards count
 
     ### activate motor forward ###
-    pwm_IN3.ChangeDutyCycle(100)
-    pwm_IN4.ChangeDutyCycle(0)
+    pwm_IN1.ChangeDutyCycle(100)
+    pwm_IN2.ChangeDutyCycle(0)
     pwm_IN3.ChangeDutyCycle(100)
     pwm_IN4.ChangeDutyCycle(0)
     time.sleep(2) # let motor get to full speed
@@ -193,8 +193,8 @@ def motor_calibration(calibration_interval):
     GPIO.remove_event_detect(enLB_pin)
     #GPIO.remove_event_detect(enRA_pin)
     GPIO.remove_event_detect(enRB_pin)
-    pwm_IN3.ChangeDutyCycle(0)
-    pwm_IN4.ChangeDutyCycle(0)
+    pwm_IN1.ChangeDutyCycle(0)
+    pwm_IN2.ChangeDutyCycle(0)
     pwm_IN3.ChangeDutyCycle(0)
     pwm_IN4.ChangeDutyCycle(0)
     # forward calibration logic calibration logic
@@ -209,8 +209,8 @@ def motor_calibration(calibration_interval):
     RA = 0
     RB = 0
     ### activate motor backwards ###
-    pwm_IN3.ChangeDutyCycle(0)
-    pwm_IN4.ChangeDutyCycle(100)
+    pwm_IN1.ChangeDutyCycle(0)
+    pwm_IN2.ChangeDutyCycle(100)
     pwm_IN3.ChangeDutyCycle(0)
     pwm_IN4.ChangeDutyCycle(100)
     time.sleep(2) # let motor get to full speed
@@ -223,8 +223,8 @@ def motor_calibration(calibration_interval):
     GPIO.remove_event_detect(enLB_pin)
     #GPIO.remove_event_detect(enRA_pin)
     GPIO.remove_event_detect(enRB_pin)
-    pwm_IN3.ChangeDutyCycle(0)
-    pwm_IN4.ChangeDutyCycle(0)
+    pwm_IN1.ChangeDutyCycle(0)
+    pwm_IN2.ChangeDutyCycle(0)
     pwm_IN3.ChangeDutyCycle(0)
     pwm_IN4.ChangeDutyCycle(0)
     # backward calibration logic calibration logic
