@@ -103,7 +103,7 @@ def motorControl(motorInput, left_encoder, right_encoder):
         return
     # if either wheel reaches encoder goal then stop
     left_count, right_count =  getEncoder()
-    while(left_count < left encoder or right_count < right_encoder):
+    while(left_count < left_encoder or right_count < right_encoder):
         time.sleep(1/1000) # 1ms reduce cpu usage
         left_count, right_count = getEncoder()
     robot_goal = True
