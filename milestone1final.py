@@ -102,12 +102,12 @@ def motorControl(motorInput, left_encoder, right_encoder):
         print("Invalid right wheel velocity. Please enter a value between -1 and 1.")
         return
     # if either wheel reaches encoder goal then stop
-    current_encoder = getEncoder()
-    while(getEncoder(0) < left encoder or getEncoder(1) < right_encoder):
+    left_count, right_count =  getEncoder()
+    while(left_count < left encoder or right_count < right_encoder):
         time.sleep(1/1000) # 1ms reduce cpu usage
-        current_encoder = getEncoder()
+        left_count, right_count = getEncoder()
     robot_goal = True
-    return current_encoder
+    return left_count, right_count
         
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ## Robot
