@@ -15,7 +15,6 @@ enLB_pin = 38
 enRA_pin = 35
 enRB_pin = 37
 
-
 # Define motor control pins
 in1_pin = 12
 in2_pin = 13
@@ -180,9 +179,9 @@ def motor_calibration(calibration_interval):
     LB = 0 # left backwards count
 
     ### activate motor forward ###
-    pwm_IN3.ChangeDutyCycle(1)
+    pwm_IN3.ChangeDutyCycle(100)
     pwm_IN4.ChangeDutyCycle(0)
-    pwm_IN3.ChangeDutyCycle(1)
+    pwm_IN3.ChangeDutyCycle(100)
     pwm_IN4.ChangeDutyCycle(0)
     time.sleep(2) # let motor get to full speed
     #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
@@ -211,9 +210,9 @@ def motor_calibration(calibration_interval):
     RB = 0
     ### activate motor backwards ###
     pwm_IN3.ChangeDutyCycle(0)
-    pwm_IN4.ChangeDutyCycle(1)
+    pwm_IN4.ChangeDutyCycle(100)
     pwm_IN3.ChangeDutyCycle(0)
-    pwm_IN4.ChangeDutyCycle(1)
+    pwm_IN4.ChangeDutyCycle(100)
     time.sleep(2) # let motor get to full speed
     #GPIO.add_event_detect(enLA_pin, GPIO.RISING, callback=encoderLA_callback) # Add interrupt event listeners
     GPIO.add_event_detect(enLB_pin, GPIO.RISING, callback=encoderLB_callback)
