@@ -154,11 +154,11 @@ class KalmanFilter {
 
     // Helper functions for matrix operations
     add(A, B) {
-        return A.map((row, i) => row.map((val, j) => val + B[i][j]));
+        return A.map((r, i) => r.map((v, j) => v + B[i][j])); 
     }
 
     subtract(A, B) {
-        return A.map((row, i) => row.map((val, j) => val - B[i][j]));
+        return A.map((valueA, indexInA) => valueA - B[indexInA]);
     }
 
     multiply(A, B) {
