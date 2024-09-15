@@ -69,64 +69,130 @@ class SensorData {
   }
 }
 
-// Kalman Filter Class
-class KalmanFilter {
-    constructor() {
-        // State vector [x, y, theta, v] where v is the velocity
-        // Initialize to 0 
-        this.x = [0, 0, 0, 0];
-        // Covariance matrix
-        this.P = [
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1]
-        ];
-        // Process noise covariance
-        this.Q = [
-            [0.01, 0, 0, 0],
-            [0, 0.01, 0, 0],
-            [0, 0, 0.01, 0],
-            [0, 0, 0, 0.01]
-        ];
-        // Measurement noise covariance
-        this.R = [
-            [0.1, 0, 0],
-            [0, 0.1, 0],
-            [0, 0, 0.1]
-        ];
+// Kalman Filter
+class EKF {
+    constructor(wheel_radius, wheel_separation) {
+
+        this.wheel_radius = wheel_radius          // Radius of wheels (assumed to be equal)
+        this.wheel_separation = wheel_separation  // Distance between two wheels
+        // Initializing state vector
+        // State vector [x, y, theta]
+        this.state = [0, 0, 0];
+
+
+        // State covariance matrix
+        this.P = [[0, 0, 0],
+                  [0, 0, 0],
+                  [0, 0, 0]];
+
+        // Sensor noise
+        this.R = [];
+        
         // Measurement matrix
-        this.H = [
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0]
-        ];
-        // Identity matrix
-        this.I = [
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1]
-        ];
+        this.H = [];
     }
 
+    // Return state vector [x,y,theta]
+    getState(){
+      return this.state
+    }
+
+    // State transition matrix F
+    stateTransition(drive_meas) {
+      let F = [[1, 0, 0],
+               [0, 1, 0],
+               [0, 0, 1]];
+
+      const [v_linear, v_ang] = this.convertWheelTicks(drive_meas.left_speed, drive_meas.right_speed)
+      const th = this.state[2];
+      const dt = drive_meas.dt;
+
+      if (v_ang === 0) {
+        F[0][2] = -Math.sin(th)*v_linear*dt;
+        F[1][2] = Math.cos(th)*lin_vel*dt;
+      }
+      else {
+        F[0][2] = (v_linear/v_ang) * (Math.cos(th + dt*v_ang) - Math.cos(th));
+        F[1][2] = -(v_linear/v_ang) * (Math.sin(th + dt*v_ang) + Math.sin(th));
+      }    
+      return F;
+    }
+
+    // Compute matrix Q for update noise
+    predictCovariance(drive_meas){
+      // Derivative of lin_vel, ang_vel w.r.t. left_speed, right_speed
+      const Jac1 = [[this.wheel_radius/2, this.wheel_radius/2],
+                      [-this.wheel_radius/this.wheel_separation, this.wheel_radius/this.wheel_separation]];
+      
+      const [v_linear, v_ang] = this.convertWheelTicks(drive_meas.left_speed, drive_meas.right_speed);
+      const th = this.state[2];
+      const dt = drive_meas.dt;
+
+      // Derivative of x,y,theta w.r.t. lin_vel, ang_vel
+      let Jac2 = [[0, 0],
+                  [0, 0],
+                  [0, 0]];
+
+        if (v_ang === 0) {
+            Jac2[0][0] = dt*Math.cos(th);
+            Jac2[1][0] = dt*Math.sin(th);
+        } 
+        else {
+            const th2 = th + dt*v_ang;
+            Jac2[0][0] = (1/v_ang) * (Math.sin(th2)-Math.sin(th));
+            Jac2[0][1] = (-v_linear/(v_ang**2)) * (Math.sin(th2)-Math.sin(th)) + (v_linear/v_ang) * (dt*Math.cos(th2));
+            Jac2[1][0] = (-1/v_ang) * (Math.cos(th2) - Math.cos(th));
+            Jac2[1][1] = (v_linear/(v_ang**2)) * (Math.cos(th2) - Math.cos(th)) - (v_linear/v_ang) * (-dt*Math.sin(th2));
+            Jac2[2][1] = dt;
+        }
+    }
+
+
+    // Input left and right wheel ticks
+    // Outputs linear and angular velocity
+    convertWheelTicks(v_left, v_right) {
+      // Comvert ticks to meters
+      let v_left_m = v_left * this.wheel_radius;
+      let v_right_m = v_right * this.wheel_radius;
+
+      // Computre linear and angular velocities
+      let v_linear = (v_left_m + v_right_m) /2;
+      let v_ang = (v_right_m - v_left_m) / this.wheel_separation;
+
+      return [v_linear, v_ang];
+    }
+
+
     // Prediction step
-    predict() {
-        
+    predict(drive_meas) {
+      // Predict covariance matrix
+      let Q = this.predictCovariance(drive_meas);
+
     }
 
     // Update step
     update() {
+      // Kalman gain
+      
+      // Update state
+
+      // Update covariance matrix
     }
+
+
+
+
+    // -----------------------------------------------
+    // Helper functions
+    // -----------------------------------------------
+
 
     // Helper functions for matrix operations
-    add(A, B) {
-        return A.map((r, i) => r.map((v, j) => v + B[i][j])); 
-    }
+    add(A, B) { return A.map((r, i) => r.map((v, j) => v + B[i][j])); }
 
-    subtract(A, B) {
-        return A.map((valueA, indexInA) => valueA - B[indexInA]);
-    }
+    subtract(A, B) { return A.map((valueA, indexInA) => valueA - B[indexInA]); }
+
+    transpose(M) { return M[0].map((_, colIndex) => M.map(row => row[colIndex])); }
 
     multiply(A, B) {
       var result = [];
@@ -141,11 +207,7 @@ class KalmanFilter {
           }
       }
       return result;
-  }
-
-    transpose(M) {
-        return M[0].map((_, colIndex) => M.map(row => row[colIndex]));
-    }
+    };
 
     // Returns the inverse of matrix `M`.
     inverse(M){
@@ -226,7 +288,7 @@ class KalmanFilter {
       
       //we've done all operations, C should be the identity, matrix I should be the inverse:
       return I;
-    }
+    };
 }
 
 
@@ -237,6 +299,17 @@ let sendDataCheck; // stops client sending same data to server multiple times
 const interval = 100; // period of sending data back to the server (ms)
 const sensorData = new SensorData();
 let motorControl = [1, 1, 0]; //left right tosend
+const startTime = new Date(); // Start time of program
+var curTime = startTime; // Time used to calculate time interval
+
+
+
+// Wheel ticks should be returned as an object
+const drive_meas = { left_speed:  0,
+                     right_speed: 0,
+                     dt: 0 
+                    };
+
 
 // DOM loaded callback
 document.addEventListener('DOMContentLoaded', initialiseApp);
