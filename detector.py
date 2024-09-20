@@ -52,8 +52,19 @@ class Detector:
 
 
     # distance = actual radius / measured radius * focal length
-    def get_dist(self, measured_radius):
-        return (self.true_radius/measured_radius)*self.f
+    def get_dist(self, measured_radius, ball_center):
+        distance =  (self.true_radius/measured_radius)*self.f
+        
+        x_shift = self.FRAME_WIDTH/2 - ball_center  # x distance between bounding box centre and centreline in camera view
+        theta = np.arctan(x_shift/self.f)           # angle of ball relative to the robot
+        
+        # relative object location
+        #distance_obj = distance/np.cos(theta) # relative distance between robot and object
+        x_relative = distance                   # relative x pose
+        y_relative = distance*np.tan(theta)     # relative y pose
+
+        return x_relative, y_relative
+
     
     def morph_ops(self, thresh):
         erode_element = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
