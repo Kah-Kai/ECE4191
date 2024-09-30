@@ -133,9 +133,9 @@ class Detector:
                         
                         return center[0], center[1], ball_centered, dist
 
-
-    def detect_ball(self):
+    def detect_line(self):
         pass
 
-    def detect_line(self):
+    def run(self):
+        # Detect ball and line
         pass
